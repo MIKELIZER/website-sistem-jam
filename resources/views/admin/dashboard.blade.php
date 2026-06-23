@@ -1,0 +1,111 @@
+@extends('layouts.admin')
+
+@section('content')
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Dashboard</h2>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-white-50 text-uppercase">Total Products</h5>
+                <p class="card-text fs-2 fw-bold">{{ $totalProducts }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-white-50 text-uppercase">Total Customers</h5>
+                <p class="card-text fs-2 fw-bold">{{ $totalCustomers }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3 shadow-sm border-0">
+            <div class="card-body text-dark">
+                <h5 class="card-title text-uppercase" style="color: #664d03">Total Orders</h5>
+                <p class="card-text fs-2 fw-bold">{{ $totalOrders }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3 shadow-sm border-0">
+            <div class="card-body text-dark">
+                <h5 class="card-title text-uppercase" style="color: #055160">Total Revenue</h5>
+                <p class="card-text fs-4 fw-bold mt-2">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white fw-bold">Quick Actions</div>
+            <div class="card-body">
+                <a href="{{ route('admin.products.create') }}" class="btn btn-primary me-2">
+                    <i class="bi bi-plus-circle"></i> Add New Product
+                </a>
+                <a href="{{ route('admin.categories.create') }}" class="btn btn-secondary me-2">
+                    <i class="bi bi-tags"></i> Add Category
+                </a>
+                <a href="{{ route('admin.orders.index') }}" class="btn btn-info text-white">
+                    <i class="bi bi-box-seam"></i> Manage Orders
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white fw-bold">Recent Orders</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Order Number</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($recentOrders as $order)
+                <tr>
+                    <td><strong>{{ $order->order_number }}</strong></td>
+                    <td>{{ optional($order->user)->name }}</td>
+                    <td>
+                        @if($order->status == 'pending_shipping_cost')
+                            <span class="badge bg-warning text-dark">Need Shipping Cost</span>
+                        @elseif($order->status == 'pending_payment')
+                            <span class="badge bg-info">Awaiting Payment</span>
+                        @elseif($order->status == 'pending_verification')
+                            <span class="badge bg-info text-dark">Verify Payment</span>
+                        @elseif($order->status == 'processing')
+                            <span class="badge bg-primary">Processing</span>
+                        @elseif($order->status == 'shipped')
+                            <span class="badge bg-info">Shipped</span>
+                        @elseif($order->status == 'completed')
+                            <span class="badge bg-success">Completed</span>
+                        @else
+                            <span class="badge bg-secondary">{{ ucfirst($order->status) }}</span>
+                        @endif
+                    </td>
+                    <td>{{ $order->created_at->format('d M Y') }}</td>
+                    <td class="text-end">
+                        <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary">Manage</a>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">No recent orders.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+@endsection
